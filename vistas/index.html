@@ -89,9 +89,12 @@
             <thead>
                 <tr>
                     <th scope="col">#</th>
+                    <th scope="col">Nombres</th>
+                    <th scope="col">Apellidos</th>
                     <th scope="col">Fecha de Operación</th>
                     <th scope="col">Monto Pagado</th>
                     <th scope="col">Monto Depositado</th>
+                    <th scope="col">Ver Detalles</th>
                 </tr>
             </thead>
             <tbody>
@@ -154,8 +157,7 @@
                 listDate(fecha);
             } else {
                 // Caso: Ni DNI ni fecha presentes
-                alert('Por favor, proporciona al menos el DNI o la fecha para obtener la lista.');
-            }
+                listAll();            }
         });
     });
     function list() {
@@ -186,9 +188,12 @@
             var contentHtml = "";
             $.each(lista, function (i, t) {
                 contentHtml += "<tr>";
+                contentHtml += "<td>" + (i + 1) + "</td>";
                 contentHtml += "<td>" + t.nombres + "</td>";
                 contentHtml += "<td>" + t.apellidos + "</td>";
-                contentHtml += "<td>" + t.correo + "</td>";
+                contentHtml += "<td>" + t.fecha_de_operacion + "</td>";
+                contentHtml += "<td>S/. " + t.monto_pagado + "</td>";
+                contentHtml += "<td>S/. " + t.monto_depositado + "</td>";
                 contentHtml += "<td><a class='btn btn-warning' href='detalles.html?dni=" + (t.dni) + "'>Mas detalles</a></td>";
                 contentHtml += "</tr>";
 
@@ -201,15 +206,42 @@
         });
     }
 
-    function obtenerListaConDni(dni) {
+    function listDni(dni) {
         // Lógica para obtener la lista solo con DNI
-        // ...
     }
 
-    function obtenerListaConFecha(fecha) {
+    function listDate(fecha) {
         // Lógica para obtener la lista solo con fecha
-        // ...
     }
+
+    function listAll() {
+            $.ajax({
+            method: "GET",
+            dataType: "json",
+            crossDomain: true,
+            url: "http://localhost:3000/transacciones"
+        }).done(function (data) {
+            var lista = data;
+            var contentHtml = "";
+            $.each(lista, function (i, t) {
+                contentHtml += "<tr>";
+                contentHtml += "<td>" + (i + 1) + "</td>";
+                contentHtml += "<td>" + t.nombres + "</td>";
+                contentHtml += "<td>" + t.apellidos + "</td>";
+                contentHtml += "<td>" + t.fecha_de_operacion + "</td>";
+                contentHtml += "<td>S/. " + t.monto_pagado + "</td>";
+                contentHtml += "<td>S/. " + t.monto_depositado + "</td>";
+                contentHtml += "<td><a class='btn btn-warning' href='detalles.html?dni=" + (t.dni) + "'>Mas detalles</a></td>";
+                contentHtml += "</tr>";
+
+            });
+            $("table tbody").html(contentHtml);
+        }).fail(function (err) {
+            var jsonData = err.responseJSON;
+            console.log(jsonData.msg);
+            alert(jsonData.msg);
+        });
+        }
 </script>
 
 

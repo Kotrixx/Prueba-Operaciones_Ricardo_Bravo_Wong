@@ -22,9 +22,10 @@ app.get('/transacciones', (req, res) => {
   const { dni, fecha } = req.query;
 
   // Verificar si hay o no fecha
-  const date_condition = fecha ? `AND fecha_de_operacion = '${fecha}'` : '';
+  const date_condition = fecha ? `WHERE dni = ${dni} AND fecha_de_operacion = '${fecha}'` : '';
+  const condition = (!dni && !fecha) ? 'ORDER BY fecha_de_operacion DESC LIMIT 10' : '';
 
-  const query = `SELECT * FROM transacciones WHERE dni = ${dni} ${date_condition}`;
+  const query = `SELECT * FROM transacciones t INNER JOIN clientes c ON t.dni = c.dni ${date_condition} ${condition}`;
 
   db.all(query, (err, rows) => {
     if (err) {
