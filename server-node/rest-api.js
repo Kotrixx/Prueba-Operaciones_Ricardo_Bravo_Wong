@@ -20,12 +20,17 @@ app.use(cors(corsOptions));
 //RUTA PARA LISTAR TRANSACCIONES FILTRADO POR DNI Y/O FEECHA
 app.get('/transacciones', (req, res) => {
   const { dni, fecha } = req.query;
+  
+  var query = `SELECT * FROM transacciones t INNER JOIN clientes c ON t.dni = c.dni `;
 
   // Verificar si hay o no fecha
-  const date_condition = fecha ? `WHERE dni = ${dni} AND fecha_de_operacion = '${fecha}'` : '';
-  const condition = (!dni && !fecha) ? 'ORDER BY fecha_de_operacion DESC LIMIT 10' : '';
-
-  const query = `SELECT * FROM transacciones t INNER JOIN clientes c ON t.dni = c.dni ${date_condition} ${condition}`;
+  if (dni && fecha) {
+      console.log("asd")
+      query += `WHERE t.dni = ${dni} AND fecha_de_operacion = '${fecha}'`
+  } else if (dni) {
+      console.log(dni)
+      query = `SELECT * FROM transacciones t INNER JOIN clientes c ON t.dni = c.dni WHERE t.dni = ${dni} ORDER BY fecha_de_operacion DESC LIMIT 10 `;
+  } 
 
   db.all(query, (err, rows) => {
     if (err) {

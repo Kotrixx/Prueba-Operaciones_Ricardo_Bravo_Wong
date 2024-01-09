@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
@@ -39,34 +38,15 @@
                     <div class="text-center text-white">
                         <!-- Page heading-->
                         <h1 class="mb-5">¡Billetera válida únicamente con tarjeta de Crédito!</h1>
-                        <form class="form" id="filterForm" >
+                        <form class="form" id="filterForm" onsubmit="list(); return false;">
                             <!-- Email address input-->
                             <div class="row">
                                 <div class="col">
-                                    <input class="form-control form-control-lg" id="dniInput" type="number" placeholder="DNI"/>
+                                    <input class="form-control form-control-lg" id="dniInput" type="number" placeholder="DNI" />
                                 </div>
-                                <div class="col-auto"><button class="btn btn-primary btn-lg" id="submitButton"
-                                        type="button" onclick="list()">Buscar</button>
+                                <div class="col-auto">
+                                    <button class="btn btn-primary btn-lg" id="submitButton" type="submit">Buscar</button>
                                 </div>
-                            </div>
-                            <!-- Submit success message-->
-                            <!---->
-                            <!-- This is what your users will see when the form-->
-                            <!-- has successfully submitted-->
-                            <div class="d-none" id="submitSuccessMessage">
-                                <div class="text-center mb-3">
-                                    <div class="fw-bolder">Form submission successful!</div>
-                                    <p>To activate this form, sign up at</p>
-                                    <a class="text-white"
-                                        href="https://startbootstrap.com/solution/contact-forms">https://startbootstrap.com/solution/contact-forms</a>
-                                </div>
-                            </div>
-                            <!-- Submit error message-->
-                            <!---->
-                            <!-- This is what your users will see when there is-->
-                            <!-- an error submitting the form-->
-                            <div class="d-none" id="submitErrorMessage">
-                                <div class="text-center text-danger mb-3">Error sending message!</div>
                             </div>
                         </form>
                     </div>
@@ -80,7 +60,7 @@
             <div class="col-lg-12  my-auto showcase-text">
                 <h2>Lista de Operaciones</h2>
                 <label for="fechaOperacion">Seleccionar Fecha:</label>
-                <input type="date" id="fechaOperacion" name="fechaOperacion" onchange="cargarOperaciones()" />
+                <input type="date" id="fechaOperacion" name="fechaOperacion" />
 
                 <p class="lead mb-0"></p>
             </div>
@@ -103,7 +83,6 @@
         </table>
     </section>
 
-
     <!-- Footer-->
     <footer class="footer bg-dark">
         <div class="container">
@@ -113,8 +92,6 @@
                         <p class="text-muted small mb-4 mb-lg-0">&copy; Postulante: Ricardo Bravo Wong</p>
                         <p class="text-muted small mb-4 mb-lg-0">Correo: a20206331@pucp.edu.pe</p>
                         <p class="text-muted small mb-4 mb-lg-0">Número: +51 987 703 865</p>
-
-
                 </div>
                 <div class="col-lg-6 h-100 text-center text-lg-end my-auto">
                     <ul class="list-inline mb-0">
@@ -127,10 +104,8 @@
             </div>
         </div>
     </footer>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-
-
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- Bootstrap core JS-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Core theme JS-->
@@ -143,21 +118,30 @@
             const urlParams = new URLSearchParams(window.location.search);
             const dni = urlParams.get('dni');
             const fecha = urlParams.get('fecha');
-
+            
             // Verifica la presencia de DNI y fecha
-            if (dni && fecha) {
+            if (!dni && fecha=='') {
+                console.log("1");
+                // DNI presente
+                listAll();
+            } else if (dni && fecha=='') {
+                // Solo fecha presente
+                console.log("2");
+                listDni(dni);
+            } else {
+                // Caso: Ni DNI ni fecha presentes
+                console.log("3");
+                listDni(dni);
+          
+            }
+
+
+            /*if (!dni && fecha) {
                 // DNI y fecha presentes
                 console.log("ingrese")
                 listDniAndDate(dni, fecha);
-            } else if (dni) {
-                // DNI presente
-                listDni(dni);
-            } else if (fecha) {
-                // Solo fecha presente
-                listDate(fecha);
-            } else {
-                // Caso: Ni DNI ni fecha presentes
-                listAll();            }
+            } */
+
         });
     });
     function list() {
@@ -182,48 +166,53 @@
             method: "GET",
             dataType: "json",
             crossDomain: true,
-            url: "http://localhost:3000/transacciones?fecha=2024-01-27&dni=1"
+            url: `http://localhost:3000/transacciones?dni=${dni}&fecha=${fecha}`
         }).done(function (data) {
-            var lista = data;
-            var contentHtml = "";
-            $.each(lista, function (i, t) {
-                contentHtml += "<tr>";
-                contentHtml += "<td>" + (i + 1) + "</td>";
-                contentHtml += "<td>" + t.nombres + "</td>";
-                contentHtml += "<td>" + t.apellidos + "</td>";
-                contentHtml += "<td>" + t.fecha_de_operacion + "</td>";
-                contentHtml += "<td>S/. " + t.monto_pagado + "</td>";
-                contentHtml += "<td>S/. " + t.monto_depositado + "</td>";
-                contentHtml += "<td><a class='btn btn-warning' href='detalles.html?dni=" + (t.dni) + "'>Mas detalles</a></td>";
-                contentHtml += "</tr>";
-
-            });
-            $("table tbody").html(contentHtml);
+            generateTableContent(data);
         }).fail(function (err) {
-            var jsonData = err.responseJSON;
-            console.log(jsonData.msg);
-            alert(jsonData.msg);
+            console.log(err); // Imprime el error completo en la consola para entender su estructura
+            alert("Error al obtener los datos. Consulta la consola para más detalles.");
         });
     }
 
     function listDni(dni) {
-        // Lógica para obtener la lista solo con DNI
-    }
+            // Lógica para obtener la lista solo con DNI
+            $.ajax({
+                method: "GET",
+                dataType: "json",
+                crossDomain: true,
+                url: `http://localhost:3000/transacciones?dni=${dni}`
+            }).done(function (data) {
+                generateTableContent(data);
+            }).fail(function (err) {
+                console.log(err); // Imprime el error completo en la consola para entender su estructura
+                alert("Error al obtener los datos. Consulta la consola para más detalles.");
+            });
+        }
 
     function listDate(fecha) {
         // Lógica para obtener la lista solo con fecha
     }
 
     function listAll() {
-            $.ajax({
-            method: "GET",
-            dataType: "json",
-            crossDomain: true,
-            url: "http://localhost:3000/transacciones"
+        $.ajax({
+        method: "GET",
+        dataType: "json",
+        crossDomain: true,
+        url: "http://localhost:3000/transacciones"
         }).done(function (data) {
-            var lista = data;
+        var contentHtml = generateTableContent(data);
+        $("table tbody").html(contentHtml);
+    }).fail(function (err) {
+            console.log(err); // Imprime el error completo en la consola para entender su estructura
+            alert("Error al obtener los datos. Consulta la consola para más detalles.");
+        });
+    }
+
+    //Funcion para rellenar las tablas
+    function generateTableContent(data) {
             var contentHtml = "";
-            $.each(lista, function (i, t) {
+            $.each(data, function (i, t) {
                 contentHtml += "<tr>";
                 contentHtml += "<td>" + (i + 1) + "</td>";
                 contentHtml += "<td>" + t.nombres + "</td>";
@@ -233,21 +222,11 @@
                 contentHtml += "<td>S/. " + t.monto_depositado + "</td>";
                 contentHtml += "<td><a class='btn btn-warning' href='detalles.html?dni=" + (t.dni) + "'>Mas detalles</a></td>";
                 contentHtml += "</tr>";
-
             });
+
+            // Actualiza la tabla en el HTML
             $("table tbody").html(contentHtml);
-        }).fail(function (err) {
-            var jsonData = err.responseJSON;
-            console.log(jsonData.msg);
-            alert(jsonData.msg);
-        });
         }
 </script>
-
-
-
-
-
 </body>
-
 </html>
