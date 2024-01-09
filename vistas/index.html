@@ -39,7 +39,36 @@
                     <div class="text-center text-white">
                         <!-- Page heading-->
                         <h1 class="mb-5">¡Billetera válida únicamente con tarjeta de Crédito!</h1>
-
+                        <form class="form" id="filterForm" >
+                            <!-- Email address input-->
+                            <div class="row">
+                                <div class="col">
+                                    <input class="form-control form-control-lg" id="dniInput" type="number" placeholder="DNI"/>
+                                </div>
+                                <div class="col-auto"><button class="btn btn-primary btn-lg" id="submitButton"
+                                        type="button" onclick="list()">Buscar</button>
+                                </div>
+                            </div>
+                            <!-- Submit success message-->
+                            <!---->
+                            <!-- This is what your users will see when the form-->
+                            <!-- has successfully submitted-->
+                            <div class="d-none" id="submitSuccessMessage">
+                                <div class="text-center mb-3">
+                                    <div class="fw-bolder">Form submission successful!</div>
+                                    <p>To activate this form, sign up at</p>
+                                    <a class="text-white"
+                                        href="https://startbootstrap.com/solution/contact-forms">https://startbootstrap.com/solution/contact-forms</a>
+                                </div>
+                            </div>
+                            <!-- Submit error message-->
+                            <!---->
+                            <!-- This is what your users will see when there is-->
+                            <!-- an error submitting the form-->
+                            <div class="d-none" id="submitErrorMessage">
+                                <div class="text-center text-danger mb-3">Error sending message!</div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -105,34 +134,88 @@
     <script src="js/scripts.js"></script>
     <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
     <script>
-        $(document).ready(function () {
-            $("#obtenerLista").ready(function () {
-                $.ajax({
-                    method: "GET",
-                    dataType: "json",
-                    crossDomain: true,
-                    url: "http://localhost:3000/items"
-                }).done(function (data) {
-                    var lista = data;
-                    var contentHtml = "";
-                    $.each(lista, function (i, t) {
-                        contentHtml += "<tr>";
-                        contentHtml += "<td>" + t.nombres + "</td>";
-                        contentHtml += "<td>" + t.apellidos + "</td>";
-                        contentHtml += "<td>" + t.correo + "</td>";
-                        contentHtml += "<td><a class='btn btn-warning' href='detalles.html?dni=" + (t.dni) + "'>Mas detalles</a></td>";
-                        contentHtml += "</tr>";
+    $(document).ready(function () {
+        $("#obtenerLista").ready(function () {
+            // Obtén el DNI y la fecha de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const dni = urlParams.get('dni');
+            const fecha = urlParams.get('fecha');
 
-                    });
-                    $("table tbody").html(contentHtml);
-                }).fail(function (err) {
-                    var jsonData = err.responseJSON;
-                    console.log(jsonData.msg);
-                    alert(jsonData.msg);
-                });
-            });
+            // Verifica la presencia de DNI y fecha
+            if (dni && fecha) {
+                // DNI y fecha presentes
+                console.log("ingrese")
+                listDniAndDate(dni, fecha);
+            } else if (dni) {
+                // DNI presente
+                listDni(dni);
+            } else if (fecha) {
+                // Solo fecha presente
+                listDate(fecha);
+            } else {
+                // Caso: Ni DNI ni fecha presentes
+                alert('Por favor, proporciona al menos el DNI o la fecha para obtener la lista.');
+            }
         });
-    </script>
+    });
+    function list() {
+        const dni = document.getElementById('dniInput').value;
+        const fecha = document.getElementById('fechaOperacion').value;
+
+        // Actualiza la URL con los nuevos parámetros
+        const newParams = new URLSearchParams(window.location.search);
+        newParams.set('dni', dni);
+        newParams.set('fecha', fecha);
+
+        // Actualiza la URL sin recargar la página
+        window.history.replaceState({}, '', `${location.pathname}?${newParams}`);
+
+        // Ejemplo de cómo podrías llamar a tu función obtenerListaConDniYFecha
+        listDniAndDate(dni, fecha);
+    }
+    function listDniAndDate(dni, fecha) {
+        // Lógica para obtener la lista con DNI y fecha
+        // ...
+        $.ajax({
+            method: "GET",
+            dataType: "json",
+            crossDomain: true,
+            url: "http://localhost:3000/transacciones?fecha=2024-01-27&dni=1"
+        }).done(function (data) {
+            var lista = data;
+            var contentHtml = "";
+            $.each(lista, function (i, t) {
+                contentHtml += "<tr>";
+                contentHtml += "<td>" + t.nombres + "</td>";
+                contentHtml += "<td>" + t.apellidos + "</td>";
+                contentHtml += "<td>" + t.correo + "</td>";
+                contentHtml += "<td><a class='btn btn-warning' href='detalles.html?dni=" + (t.dni) + "'>Mas detalles</a></td>";
+                contentHtml += "</tr>";
+
+            });
+            $("table tbody").html(contentHtml);
+        }).fail(function (err) {
+            var jsonData = err.responseJSON;
+            console.log(jsonData.msg);
+            alert(jsonData.msg);
+        });
+    }
+
+    function obtenerListaConDni(dni) {
+        // Lógica para obtener la lista solo con DNI
+        // ...
+    }
+
+    function obtenerListaConFecha(fecha) {
+        // Lógica para obtener la lista solo con fecha
+        // ...
+    }
+</script>
+
+
+
+
+
 </body>
 
 </html>
