@@ -21,12 +21,12 @@ app.use(cors(corsOptions));
 app.get('/transacciones', (req, res) => {
   const { dni, fecha } = req.query;
   
-  var query = `SELECT * FROM transacciones t INNER JOIN clientes c ON t.dni = c.dni `;
+  var query = `SELECT * FROM transacciones t INNER JOIN clientes c ON t.dni = c.dni ORDER BY fecha_de_operacion DESC LIMIT 10 `;
 
   // Verificar si hay o no fecha
   if (dni && fecha) {
       console.log("asd")
-      query += `WHERE t.dni = ${dni} AND fecha_de_operacion = '${fecha}'`
+      query += `SELECT * FROM transacciones t INNER JOIN clientes c ON t.dni = c.dni WHERE t.dni = ${dni} AND fecha_de_operacion = '${fecha}'`
   } else if (dni) {
       console.log(dni)
       query = `SELECT * FROM transacciones t INNER JOIN clientes c ON t.dni = c.dni WHERE t.dni = ${dni} ORDER BY fecha_de_operacion DESC LIMIT 10 `;
