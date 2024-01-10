@@ -26,11 +26,9 @@ app.get('/transacciones', (req, res) => {
 
   // Verificar si hay o no fecha
   if (dni && fecha) {
-      console.log("asd")
     query = `SELECT * FROM transacciones t INNER JOIN clientes c ON t.dni = c.dni 
       INNER JOIN categoria cat ON cat.idCategoria = t.idCategoria WHERE t.dni = ${dni} AND fecha_de_operacion = '${fecha}'`
   } else if (dni) {
-      console.log(dni)
     query = `SELECT * FROM transacciones t INNER JOIN clientes c ON t.dni = c.dni INNER JOIN categoria cat ON cat.idCategoria = t.idCategoria
       WHERE t.dni = ${dni} ORDER BY fecha_de_operacion DESC LIMIT 10 `;
   } 

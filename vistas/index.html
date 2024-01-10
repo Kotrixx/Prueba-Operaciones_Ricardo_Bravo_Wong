@@ -74,6 +74,7 @@
                     <th scope="col">Fecha de Operación</th>
                     <th scope="col">Monto Pagado</th>
                     <th scope="col">Monto Depositado</th>
+                    <th scope="col">Tipo</th>
                     <th scope="col">Ver Detalles</th>
                 </tr>
             </thead>
@@ -119,34 +120,26 @@
             const dni = urlParams.get('dni');
             const fecha = urlParams.get('fecha');
             
-            // Verifica la presencia de DNI y fecha
-            if (!dni && fecha=='') {
+                // Verifica si hay o no fecha o dni
+            if (!dni && (fecha=='' || fecha==null)) {
                 console.log("1");
-                // DNI presente
                 listAll();
-            } else if (dni && fecha=='') {
-                // Solo fecha presente
+            } else if (dni && (fecha == '' || fecha==null)) {
+                // Solo dni presente
                 console.log("2");
                 listDni(dni);
             } else {
-                // Caso: Ni DNI ni fecha presentes
+                // DNI y fecha presentes
                 console.log("3");
-                listDni(dni);
-          
+                listDniAndDate(dni, fecha);
             }
 
-
-            /*if (!dni && fecha) {
-                // DNI y fecha presentes
-                console.log("ingrese")
-                listDniAndDate(dni, fecha);
-            } */
 
         });
     });
     function list() {
         const dni = document.getElementById('dniInput').value;
-        const fecha = document.getElementById('fechaOperacion').value;
+        const fecha = document. getElementById('fechaOperacion').value;
 
         // Actualiza la URL con los nuevos parámetros
         const newParams = new URLSearchParams(window.location.search);
@@ -156,8 +149,7 @@
         // Actualiza la URL sin recargar la página
         window.history.replaceState({}, '', `${location.pathname}?${newParams}`);
 
-        // Ejemplo de cómo podrías llamar a tu función obtenerListaConDniYFecha
-        listDniAndDate(dni, fecha);
+
     }
     function listDniAndDate(dni, fecha) {
         // Lógica para obtener la lista con DNI y fecha
@@ -168,7 +160,7 @@
             crossDomain: true,
             url: `http://localhost:3000/transacciones?dni=${dni}&fecha=${fecha}`
         }).done(function (data) {
-            gene    rateTableContent(data);
+            generateTableContent(data);
         }).fail(function (err) {
             console.log(err); // Imprime el error completo en la consola para entender su estructura
             alert("Error al obtener los datos. Consulta la consola para más detalles.");
@@ -220,7 +212,8 @@
                 contentHtml += "<td>" + t.fecha_de_operacion + "</td>";
                 contentHtml += "<td>S/. " + t.monto_pagado + "</td>";
                 contentHtml += "<td>S/. " + t.monto_depositado + "</td>";
-                contentHtml += "<td><a class='btn btn-warning' href='detalles.html?dni=" + (t.dni) + "'>Mas detalles</a></td>";
+                contentHtml += "<td>" + t.categoria + "</td>";
+                contentHtml += "<td><a class='btn btn-warning' href='detalles.html?id=" + (t.id_operacion) + "'>Mas detalles</a></td>";
                 contentHtml += "</tr>";
             });
 
