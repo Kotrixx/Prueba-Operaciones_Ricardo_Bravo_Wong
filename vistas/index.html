@@ -168,7 +168,7 @@
             crossDomain: true,
             url: `http://localhost:3000/transacciones?dni=${dni}&fecha=${fecha}`
         }).done(function (data) {
-            generateTableContent(data);
+            gene    rateTableContent(data);
         }).fail(function (err) {
             console.log(err); // Imprime el error completo en la consola para entender su estructura
             alert("Error al obtener los datos. Consulta la consola para más detalles.");
