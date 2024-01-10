@@ -21,15 +21,18 @@ app.use(cors(corsOptions));
 app.get('/transacciones', (req, res) => {
   const { dni, fecha } = req.query;
   
-  var query = `SELECT * FROM transacciones t INNER JOIN clientes c ON t.dni = c.dni ORDER BY fecha_de_operacion DESC LIMIT 10 `;
+  var query = `SELECT * FROM transacciones t INNER JOIN clientes c ON t.dni = c.dni 
+      INNER JOIN categoria cat ON cat.idCategoria = t.idCategoria ORDER BY fecha_de_operacion DESC LIMIT 10 `;
 
   // Verificar si hay o no fecha
   if (dni && fecha) {
       console.log("asd")
-      query += `SELECT * FROM transacciones t INNER JOIN clientes c ON t.dni = c.dni WHERE t.dni = ${dni} AND fecha_de_operacion = '${fecha}'`
+    query = `SELECT * FROM transacciones t INNER JOIN clientes c ON t.dni = c.dni 
+      INNER JOIN categoria cat ON cat.idCategoria = t.idCategoria WHERE t.dni = ${dni} AND fecha_de_operacion = '${fecha}'`
   } else if (dni) {
       console.log(dni)
-      query = `SELECT * FROM transacciones t INNER JOIN clientes c ON t.dni = c.dni WHERE t.dni = ${dni} ORDER BY fecha_de_operacion DESC LIMIT 10 `;
+    query = `SELECT * FROM transacciones t INNER JOIN clientes c ON t.dni = c.dni INNER JOIN categoria cat ON cat.idCategoria = t.idCategoria
+      WHERE t.dni = ${dni} ORDER BY fecha_de_operacion DESC LIMIT 10 `;
   } 
 
   db.all(query, (err, rows) => {
@@ -46,7 +49,8 @@ app.get('/transaccion', (req, res) => {
   // Verificar si hay o no id
   const id_condition = id;
   
-  const query = `SELECT * FROM transacciones t INNER JOIN clientes c ON t.dni = c.dni WHERE id_operacion = ${id_condition}`;
+  const query = `SELECT * FROM transacciones t INNER JOIN clientes c ON t.dni = c.dni 
+    INNER JOIN categoria cat ON cat.idCategoria = t.idCategoria WHERE id_operacion = ${id_condition}`;
 
   db.all(query, (err, rows) => {
     if (err) {
